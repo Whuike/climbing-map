@@ -12,13 +12,10 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ==================== 地图初始化（国内访问更快） ====================
+// ==================== 地图初始化 ====================
 let map = L.map('map').setView([35.0, 105.0], 5);
-
-// 使用高德地图瓦片（中国大陆速度明显更快）
-L.tileLayer('https://webrd02.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}', {
-    attribution: '&copy; 高德地图',
-    maxZoom: 18
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; 攀岩爱好者们'
 }).addTo(map);
 
 let currentLatLng = null;
