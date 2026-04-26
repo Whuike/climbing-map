@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>攀岩路线分享地图</title>
+    
+    <!-- Leaflet 地图 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+        <h1>🧗 攀岩路线分享地图</h1>
+        <p id="userInfo">欢迎游客</p>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="footer">
+        <button id="loginBtn">👤 登录 / 注册</button>
+        <button id="addRouteBtn">📍 上传新路线</button>
+        <button id="logoutBtn" style="display:none;">退出登录</button>
+    </div>
+
+    <!-- 登录弹窗 -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">登录账号</h2>
+            <div class="tab-buttons">
+                <button id="loginTab" class="active">登录</button>
+                <button id="registerTab">注册新账号</button>
+            </div>
+            <input type="email" id="email" placeholder="邮箱地址" />
+            <input type="password" id="password" placeholder="密码（至少6位）" />
+            <button id="authActionBtn">登录</button>
+            <p class="switch-text">
+                <span id="toggleHint">还没有账号？</span>
+                <span id="toggleMode" style="color:#3498db; cursor:pointer;">去注册</span>
+            </p>
+            <button class="close">关闭</button>
+        </div>
+    </div>
+
+    <!-- 上传路线弹窗（完整版 + 图片必传） -->
+    <!-- 上传路线弹窗（带搜索定位） -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content" style="width:95%; max-width:780px; max-height:92vh; overflow-y:auto;">
+            <h2>📍 上传新攀岩路线</h2>
+            
+            <!-- 搜索定位 -->
+            <div style="margin-bottom:20px;">
+                <label>🔍 搜索地点快速定位（推荐）</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="searchInput" placeholder="例如：阳朔月亮山、桂林七星公园" style="flex:1; padding:12px;">
+                    <button type="button" id="searchBtn">搜索</button>
+                </div>
+            </div>
+
+            <button type="button" id="pickLocationBtn" style="margin-bottom:15px;">🖱️ 或手动点击地图选点</button>
+            <p id="selectedLocation" style="font-weight:bold; color:#e67e22; margin-bottom:20px;">已选位置：未选择</p>
+
+            <!-- 表单内容 -->
+            <div class="form-grid">
+                <div><label>路线名称 <span style="color:red">*</span></label><input type="text" id="routeName" required></div>
+                <div><label>难度 <span style="color:red">*</span></label><input type="text" id="difficulty" placeholder="例如 5.11a、V7" required></div>
+                <div><label>路线类型 <span style="color:red">*</span></label><select id="routeType" required>
+                    <option value="">请选择</option>
+                    <option value="运动攀">运动攀</option>
+                    <option value="传统攀">传统攀</option>
+                    <option value="抱石">抱石</option>
+                    <option value="多段">多段</option>
+                    <option value="冰攀">冰攀</option>
+                </select></div>
+                <div><label>所在岩场 / 区域 <span style="color:red">*</span></label><input type="text" id="area" required></div>
+                <div><label>定线时间 <span style="color:red">*</span></label><input type="date" id="firstAscent" required></div>
+                <div><label>推荐快挂数量 <span style="color:red">*</span></label><input type="text" id="quickdraws" required></div>
+            </div>
+
+            <div class="form-grid">
+                <div><label>路线长度（米）</label><input type="text" id="length" placeholder="35"></div>
+                <div><label>起点-终点高度差（米）</label><input type="text" id="heightDiff" placeholder="28"></div>
+            </div>
+
+            <label>安全注意事项 <span style="color:red">*</span></label>
+            <textarea id="safety" rows="4" required></textarea>
+
+            <label>装备 Beta 建议</label>
+            <textarea id="beta" rows="2"></textarea>
+
+            <label>Crux 难点描述</label>
+            <textarea id="crux" rows="2"></textarea>
+
+            <label>额外信息 / 小Tips（选填）</label>
+            <textarea id="extraTips" rows="4" placeholder="季节、岩石类型、朝向、海拔等..."></textarea>
+
+            <label>路线照片 / Topo图 <span style="color:red">*</span></label>
+            <input type="file" id="routeImages" accept="image/*" multiple>
+
+            <div style="margin-top:25px; text-align:center;">
+                <button id="submitRouteBtn">✅ 提交路线</button>
+                <button class="close-upload" style="margin-left:15px;">取消</button>
+            </div>
+        </div>
+    </div>
+    
+<!-- 详细查看弹窗 -->
+<div id="detailModal" class="modal">
+    <div class="modal-content" style="width:90%; max-width:800px; max-height:90vh; overflow-y:auto;">
+        <h2 id="detailTitle"></h2>
+        <div id="detailContent"></div>
+        
+        <!-- 评分 -->
+        <div style="margin:20px 0;">
+            <label>给这条路线打分：</label>
+            <div id="starRating" style="font-size:28px; cursor:pointer;"></div>
+        </div>
+
+        <!-- 评论区 -->
+        <h3>💬 评论区</h3>
+        <div id="commentsList" style="max-height:300px; overflow-y:auto; border:1px solid #eee; padding:10px; margin-bottom:15px;"></div>
+        
+        <textarea id="commentInput" placeholder="写下你的看法或经验..." rows="3" style="width:100%;"></textarea>
+        <button id="submitCommentBtn">发表评论</button>
+        
+        <button class="close-detail" style="margin-top:15px;">关闭</button>
+    </div>
+</div>
+
+
+    <script src="script.js"></script>
+</body>
+</html>

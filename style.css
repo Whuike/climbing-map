@@ -1,0 +1,141 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: "Microsoft YaHei", sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.header { background: #2c3e50; color: white; text-align: center; padding: 15px 0; }
+#map { flex: 1; }
+.footer { background: white; padding: 12px; display: flex; justify-content: center; gap: 12px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+
+button {
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#loginBtn { background: #3498db; color: white; }
+#addRouteBtn { background: #e67e22; color: white; }
+#logoutBtn { background: #e74c3c; color: white; }
+
+/* 弹窗样式 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px 25px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.tab-buttons {
+    display: flex;
+    margin: 20px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+.tab-buttons button {
+    flex: 1;
+    padding: 12px;
+    background: #f8f8f8;
+    border: none;
+}
+
+.tab-buttons button.active {
+    background: #3498db;
+    color: white;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 14px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.close {
+    margin-top: 15px;
+    background: #95a5a6;
+    color: white;
+}
+
+/* 上传表单优化样式 */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-grid div {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-grid input,
+.form-grid select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+#safety {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    resize: vertical;
+}
+
+/* 统一输入框样式 */
+#uploadModal input,
+#uploadModal select,
+#uploadModal textarea {
+    box-sizing: border-box;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+#uploadModal input,
+#uploadModal select,
+#uploadModal textarea {
+    width: 100% !important;
+    padding: 12px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+#uploadModal textarea {
+    resize: vertical;
+}
